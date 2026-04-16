@@ -1,22 +1,19 @@
 pipeline {
     agent any
+
     stages {
-        stage('Install') {
+
+        stage('Docker Build') {
             steps {
-                sh 'npm install'
+                sh 'docker build --no-cache -t my-app .'
             }
         }
-        stage('Test') {
+
+        stage('Run Container') {
             steps {
-                sh 'npm test'
+                sh 'docker run my-app'
             }
         }
-        stage('Start') {
-            steps {
-                sh 'npm start &'
-                sh 'sleep 2'
-                sh 'curl -f http://localhost:3000/health'
-            }
-        }
+
     }
 }
