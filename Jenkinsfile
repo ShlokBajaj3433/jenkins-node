@@ -1,17 +1,26 @@
 pipeline {
     agent any
 
-    stages {
+    options {
+        timestamps()
+    }
 
-        stage('Docker Build') {
+    stages {
+        stage('Checkout') {
             steps {
-                sh 'docker build --no-cache -t my-app .'
+                checkout scm
             }
         }
 
-        stage('Run Container') {
+        stage('Install Dependencies') {
             steps {
-                sh 'docker run my-app'
+                sh 'npm install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'npm test'
             }
         }
 

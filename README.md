@@ -114,15 +114,14 @@ docker volume create jenkins_home
 docker run -d --name jenkins `
   -p 8080:8080 -p 50000:50000 `
   -v jenkins_home:/var/jenkins_home `
-  -v //var/run/docker.sock:/var/run/docker.sock `
   -v c:/codes/Jenkins:/workspace `
   jenkins/jenkins:lts-jdk17
 ```
 
-### 2. Install Docker CLI inside Jenkins container
+### 2. Install Node.js and npm inside Jenkins container
 
 ```powershell
-docker exec -u 0 jenkins sh -c "apt-get update && apt-get install -y docker.io"
+docker exec -u 0 jenkins sh -c "apt-get update && apt-get install -y nodejs npm"
 ```
 
 ### 3. Open Jenkins and unlock
@@ -138,10 +137,11 @@ Install suggested plugins and complete the first admin user setup.
 
 ## Jenkins Pipeline (Inside Docker Jenkins)
 
-Current Jenkins pipeline has two stages:
+Current Jenkins pipeline has three stages:
 
-1. Docker Build
-2. Run Container
+1. Checkout
+2. Install Dependencies
+3. Test
 
 ### Create Jenkins job for this project
 
@@ -155,21 +155,19 @@ Current Jenkins pipeline has two stages:
 
 ### Notes
 
-- This setup uses Docker-outside-of-Docker via the mounted Docker socket.
-- The current `Run Container` stage uses `docker run my-app`, so the container keeps running because Node server is long-lived.
-- For CI pipelines, you may want detached mode with explicit health checks and container cleanup.
+- This setup does not require Docker socket access for Jenkins builds.
+- The pipeline validates the project by running tests.
 
 ## Troubleshooting
 
 - `npm: command not found`:
-  - Install Node.js and npm
+  - Install Node.js and npm inside the Jenkins container
 - Port already in use:
   - Set another port: `PORT=4000 npm start`
-- Docker not available in Jenkins:
-  - Ensure Docker socket is mounted and Docker CLI is installed in the Jenkins container
+
 
 ## Keep It Simple and Standard
 
 - Use `npm install`, `npm start`, `npm test`
 - Keep routes and startup in one server module
-- Use Jenkins only for build/run automation
+- Use Jenkins for dependency install and test automation
