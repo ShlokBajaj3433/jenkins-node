@@ -1,2 +1,3 @@
-require('./src/server');
-// Entry point for the app
+const { startServer } = require('./src/server');
+
+startServer();
