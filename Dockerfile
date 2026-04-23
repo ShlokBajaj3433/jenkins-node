@@ -1,14 +1,13 @@
-FROM node:18
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json .
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
 
-RUN echo "Step A"
-RUN echo "Step B"
-RUN echo "Step C"
+EXPOSE 3000
+ENV PORT=3000
 
-CMD ["node", "app.js"]
+CMD ["npm", "start"]
